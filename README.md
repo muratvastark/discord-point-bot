@@ -1,6 +1,10 @@
 <h1 align="center">Welcome to Discord Point Bot</h1>
 <p align="center">Discord Point Bot for private servers.</p>
 
+## Todos
+- Message.js 
+- Voice.js
+
 ## Usage
 
 <ol>
