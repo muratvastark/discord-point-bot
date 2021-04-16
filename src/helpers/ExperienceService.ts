@@ -16,7 +16,7 @@ export class ExperienceService {
     static async addPoint(member: GuildMember, channel: GuildChannel, type: "messages" | "voices", value: number) {
         const pointData = CONFIG.SYSTEM.CHANNELS.find((parent) => parent.ID === channel.parentID && parent.TYPE === type);
         let point = type === "messages" ? pointData?.POINT : 0;
-        if (type === "voices") point = Math.round((value / 60000) * 2) * pointData?.POINT!;
+        if (type === "voices") point = Math.round(value / (pointData?.COUNT! * 60000)) * pointData?.POINT!;
 
         let document = await Model.findOne({ id: member.id });
         if (!document) {
