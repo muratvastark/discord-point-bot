@@ -1,24 +1,14 @@
 <h1 align="center">Welcome to Discord Point Bot</h1>
 <p align="center">Discord Point Bot for private servers.</p>
 
-## Todos
-- Message.js 
-- Voice.js
-
 ## Usage
 
 <ol>
-    <li>Clone repo</li>
+    <li>Clone repo and enter your settings.</li>
     <li>Install dependencies with command <code>npm install</code> or <code>yarn</code></li>
     <li>Add bot your server.</li>
     <li>Run <code>yarn start</code> or <code>npm run start</code> for production server, run <code>yarn dev</code> or <code>npm run dev</code> for development server.</li>
 </ol>
-
-## Examples
-
-<img src="./images/rank.png">
-<img src="./images/role.png">
-<img src="./images/top.png">
 
 ## Author
 
