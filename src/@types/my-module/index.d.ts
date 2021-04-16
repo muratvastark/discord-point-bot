@@ -18,6 +18,7 @@ declare module "my-module" {
         POINT: number;
         ID: string;
         TYPE: "messages" | "voices";
+        COUNT: number;
     }
 
     export interface ICommand {
