@@ -3,9 +3,11 @@ import { ICommand, IEvent } from "my-module";
 import { ExperienceService } from "../helpers/ExperienceService";
 import { CONFIG } from "../config";
 import { Core } from "../helpers/Core";
+import { IObject, IChannel } from "my-module";
 
 export default class Event implements IEvent {
     readonly name = "message";
+    private cooldowns: IObject = {};
     private categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "messages").map(
         (category) => category.ID
     );
@@ -21,14 +23,18 @@ export default class Event implements IEvent {
             if (command) command.execute({ client, message, args });
         } else {
             const channel = message.channel as GuildChannel;
-            if (
-                !channel.parentID ||
-                !this.categories.includes(channel.parentID) ||
-                !client.checkStaff(message.author.id) === true
-            )
+            if (!channel.parentID || !this.categories.includes(channel.parentID) || !client.checkStaff(message.author.id))
                 return;
 
-            ExperienceService.addPoint(message.member!, channel, "messages", 1);
+            const cooldownData = CONFIG.SYSTEM.CHANNELS.find((category) => category.ID === channel.parentID);
+
+            let userCooldown = this.cooldowns[message.author.id] || 0;
+            userCooldown++;
+
+            if (userCooldown >= cooldownData?.COUNT!) {
+                ExperienceService.addPoint(message.member!, channel, "messages", 1);
+                userCooldown = 0;
+            }
         }
     }
 }
