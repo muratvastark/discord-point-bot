@@ -6,7 +6,7 @@ import { Core } from "../helpers/Core";
 
 export default class Event implements IEvent {
     readonly name = "voiceStateUpdate";
-    private categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "voices").map(
+    private readonly categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "voices").map(
         (category) => category.ID
     );
     private voices = new Collection();
