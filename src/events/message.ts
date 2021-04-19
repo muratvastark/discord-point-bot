@@ -3,12 +3,12 @@ import { ICommand, IEvent } from "my-module";
 import { ExperienceService } from "../helpers/ExperienceService";
 import { CONFIG } from "../config";
 import { Core } from "../helpers/Core";
-import { IObject, IChannel } from "my-module";
+import { IObject } from "my-module";
 
 export default class Event implements IEvent {
     readonly name = "message";
     private cooldowns: IObject = {};
-    private categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "messages").map(
+    private readonly categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "messages").map(
         (category) => category.ID
     );
 
@@ -29,11 +29,11 @@ export default class Event implements IEvent {
             const cooldownData = CONFIG.SYSTEM.CHANNELS.find((category) => category.ID === channel.parentID);
 
             let userCooldown = this.cooldowns[message.author.id] || 0;
-            userCooldown++;
+            this.cooldowns[message.author.id] = userCooldown + 1;
 
-            if (userCooldown >= cooldownData?.COUNT!) {
+            if (this.cooldowns[message.author.id] >= cooldownData?.COUNT!) {
                 ExperienceService.addPoint(message.member!, channel, "messages", 1);
-                userCooldown = 0;
+                delete this.cooldowns[message.author.id];
             }
         }
     }
