@@ -1,5 +1,5 @@
 import { removeProperties } from "remove-properties";
-import { GuildChannel, GuildMember, Snowflake, VoiceBroadcast } from "discord.js";
+import { GuildChannel, GuildMember, Snowflake } from "discord.js";
 import { CONFIG } from "../config";
 import { Model } from "./Model";
 
@@ -11,6 +11,20 @@ export class ExperienceService {
         }
         if (next === true) return CONFIG.SYSTEM.TASKS[currentIndex + 1];
         return CONFIG.SYSTEM.TASKS[currentIndex];
+    }
+
+    static async sync(member: GuildMember): Promise<boolean> {
+        const data = (await Model.findOne({ id: member.id })) || { points: 0 };
+        const roles = member.roles.cache.map((role) => role.id);
+        let points = 0;
+        CONFIG.SYSTEM.TASKS.forEach((task) => {
+            if (roles.includes(task.ID) && task.POINT > points) points = task.POINT;
+        });
+
+        if (points === 0 || data.points >= points) return false;
+
+        Model.updateOne({ id: member.id }, { $inc: { points: points } }, { upsert: true }).exec();
+        return true;
     }
 
     static async addPoint(member: GuildMember, channel: GuildChannel, type: "messages" | "voices", value: number) {
