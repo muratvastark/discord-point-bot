@@ -55,6 +55,8 @@ export default class Command implements ICommand {
                 .join("\n") || "Bulunamadı."
         );
 
+        console.log(data.points);
+
         // POINT
         const currentTask = ExperienceService.getTask(data.points);
         const nextTask = ExperienceService.getTask(data.points, true);
