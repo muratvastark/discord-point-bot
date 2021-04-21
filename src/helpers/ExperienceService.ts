@@ -14,7 +14,7 @@ export class ExperienceService {
     }
 
     static async sync(member: GuildMember): Promise<boolean> {
-        const data = (await Model.findOne({ id: member.id })) || { points: 0 };
+        const data = (await Model.findOne({ id: member.id }).exec()) || { points: 0 };
         const roles = member.roles.cache.map((role) => role.id);
         let points = 0;
         CONFIG.SYSTEM.TASKS.forEach((task) => {
@@ -32,7 +32,7 @@ export class ExperienceService {
         let point = type === "messages" ? pointData?.POINT : 0;
         if (type === "voices") point = Math.round(value / (pointData?.COUNT! * 60000)) * pointData?.POINT!;
 
-        let document = await Model.findOne({ id: member.id });
+        let document = await Model.findOne({ id: member.id }).exec();
         if (!document) {
             document = new Model({
                 id: member.id,
@@ -57,15 +57,15 @@ export class ExperienceService {
         document[type].total = (document[type].total || 0) + value;
         document.points = (document.points || 0) + (point as number);
 
-        await Model.updateOne({ id: member.id }, removeProperties(document.toJSON(), ["_id"]), { upsert: true });
+        await Model.updateOne({ id: member.id }, removeProperties(document.toJSON(), ["_id"]), { upsert: true }).exec();
 
         const task = this.getTask(document.points);
         if (task && !member.roles.cache.has(task.ID)) member.roles.add(task.ID);
     }
 
     static async resetStats(id?: Snowflake) {
-        if (id) await Model.deleteOne({ id: id });
-        else await Model.deleteMany({});
+        if (id) await Model.deleteOne({ id: id }).exec();
+        else await Model.deleteMany({}).exec();
     }
 
     static createBar(current: number, required: number, total: number = 8): string {
