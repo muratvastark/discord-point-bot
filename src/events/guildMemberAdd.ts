@@ -20,7 +20,7 @@ export default class Event implements IEvent {
 
             client.invites.set(member.guild.id, afterInvites);
 
-            if (invite && invite.inviter && !client.checkStaff(invite.inviter.id)) {
+            if (invite && invite.inviter && client.checkStaff(invite.inviter.id) && !isFake) {
                 Model.updateOne(
                     { id: invite.inviter.id },
                     { $inc: { invites: 1, points: CONFIG.SYSTEM.INVITE_XP } },
