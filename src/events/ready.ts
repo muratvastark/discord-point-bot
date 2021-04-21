@@ -8,13 +8,9 @@ export default class Event implements IEvent {
 
     async execute(client: Core) {
         const guild = client.guilds.cache.get(CONFIG.SYSTEM.GUILD_ID);
-        if (guild) {
-            guild.fetchInvites().then((invites) => client.invites.set(guild.id, invites));
-            guild.members.cache
-                .filter((member) => client.checkStaff(member.id))
-                .forEach((member) => ExperienceService.sync(member));
-        }
+        if (!guild) throw new Error("Guild not found.");
 
+        guild.fetchInvites().then((invites) => client.invites.set(guild.id, invites));
         console.log(`[${new Date().toLocaleString()}] ${client.user?.tag} is online!`);
     }
 }
