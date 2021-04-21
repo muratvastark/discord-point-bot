@@ -5,7 +5,7 @@ export const CONFIG = {
         TOKEN: "",
         PREFIX: "",
         STATUS: "",
-        DEVELOPERS: [],
+        DEVELOPERS: [] as string[],
         MONGO_URL: "",
     },
     SYSTEM: {
