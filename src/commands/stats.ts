@@ -13,7 +13,7 @@ export default class Command implements ICommand {
         const user = (message.mentions.users?.first() || client.users?.cache.get(args[0]) || message.author) as User;
         if (!user) return message.channel.send("Geçerli bir kullanıcı belirtmelisin.");
 
-        const data = await Model.findOne({ id: user.id });
+        const data = await Model.findOne({ id: user.id }).exec();
         if (!data) return message.channel.send("Belirtilen kullanıcının verisi bulunmamaktadır.");
 
         const embed = new MessageEmbed().setAuthor(user.tag, user.displayAvatarURL({ dynamic: true })).setColor("RANDOM");
@@ -60,7 +60,9 @@ export default class Command implements ICommand {
         const nextTask = ExperienceService.getTask(data.points, true);
         embed.addField(
             "Puan Bilgisi",
-            `${ExperienceService.createBar(data.points, nextTask.POINT, 8)} ${data.points}/${nextTask.POINT}`
+            nextTask
+                ? `${ExperienceService.createBar(data.points, nextTask.POINT, 8)} ${data.points}/${nextTask.POINT}`
+                : "Bütün görevler yapıldı!"
         );
         if (nextTask) {
             embed.addField(
