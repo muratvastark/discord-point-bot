@@ -12,7 +12,7 @@ export default class Command implements ICommand {
         const role = message.mentions.roles.first() || message.guild?.roles.cache.get(args[0]);
         if (!role) return message.channel.send("Geçerli bir rol belirtmelisin.");
 
-        const datas = await Model.find({})
+        const datas = await Model.find()
             .where("id")
             .in(role.members.map((member) => member.id))
             .exec();
