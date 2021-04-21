@@ -5,26 +5,14 @@ import { Model } from "./Model";
 
 export class ExperienceService {
     static getTask(value: number, next: boolean = false) {
+        const tasks = CONFIG.SYSTEM.TASKS.sort((a, b) => a.POINT - b.POINT);
         let currentIndex = -1;
-        for (let i = 0; i < CONFIG.SYSTEM.TASKS.length; i++) {
-            if (value >= CONFIG.SYSTEM.TASKS[i].POINT) currentIndex = i;
+
+        for (let i = 0; i < tasks.length; i++) {
+            if (value >= tasks[i].POINT) currentIndex = i;
         }
-        if (next === true) return CONFIG.SYSTEM.TASKS[currentIndex + 1];
-        return CONFIG.SYSTEM.TASKS[currentIndex];
-    }
-
-    static async sync(member: GuildMember): Promise<boolean> {
-        const data = (await Model.findOne({ id: member.id }).exec()) || { points: 0 };
-        const roles = member.roles.cache.map((role) => role.id);
-        let points = 0;
-        CONFIG.SYSTEM.TASKS.forEach((task) => {
-            if (roles.includes(task.ID) && task.POINT > points) points = task.POINT;
-        });
-
-        if (points === 0 || data.points >= points) return false;
-
-        Model.updateOne({ id: member.id }, { $inc: { points: points } }, { upsert: true }).exec();
-        return true;
+        if (next === true) return tasks[currentIndex + 1];
+        return tasks[currentIndex];
     }
 
     static async addPoint(member: GuildMember, channel: GuildChannel, type: "messages" | "voices", value: number) {
@@ -65,7 +53,7 @@ export class ExperienceService {
 
     static async resetStats(id?: Snowflake) {
         if (id) await Model.deleteOne({ id: id }).exec();
-        else await Model.deleteMany({}).exec();
+        else await Model.deleteMany().exec();
     }
 
     static createBar(current: number, required: number, total: number = 8): string {
