@@ -31,8 +31,6 @@ export default class Event implements IEvent {
             let userCooldown = this.cooldowns[message.author.id] || 0;
             this.cooldowns[message.author.id] = userCooldown + 1;
 
-            console.log(this.cooldowns[message.author.id]);
-
             if (this.cooldowns[message.author.id] >= cooldownData?.COUNT!) {
                 ExperienceService.addPoint(message.member!, channel, "messages", 1);
                 delete this.cooldowns[message.author.id];
