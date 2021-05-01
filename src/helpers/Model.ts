@@ -12,7 +12,7 @@ const schema = new Schema({
         default: 0,
     },
     inviter: {
-        type: Number,
+        type: String,
         default: 0,
     },
     voices: {
