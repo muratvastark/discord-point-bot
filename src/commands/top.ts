@@ -7,8 +7,6 @@ export default class Command implements ICommand {
     readonly usages = ["top"];
 
     async execute({ message }: CommandArgs) {
-        if (!message.member?.hasPermission("ADMINISTRATOR")) return;
-
         const datas = await Model.find().exec();
         if (!datas.length) return message.channel.send("Veri bulunmamaktadır.");
 
