@@ -8,7 +8,7 @@ export default class Command implements ICommand {
     readonly usages = ["voice", "voices", "voice-info", "voiceinfo"];
 
     async execute({ client, message, args }: CommandArgs) {
-        if (!client.checkStaff(message.author.id)) return;
+        if (client.checkStaff(message.author.id) === false) return;
 
         const user = (message.mentions.users?.first() || client.users?.cache.get(args[0]) || message.author) as User;
         if (!user) return message.channel.send("Geçerli bir kullanıcı belirtmelisin.");
