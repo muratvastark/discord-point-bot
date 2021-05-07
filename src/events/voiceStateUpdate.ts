@@ -1,5 +1,5 @@
 import { Collection, GuildChannel, VoiceState } from "discord.js";
-import { IEvent } from "my-module";
+import { IEvent, IVoice } from "my-module";
 import { ExperienceService } from "../helpers/ExperienceService";
 import { CONFIG } from "../config";
 import { Core } from "../helpers/Core";
@@ -9,38 +9,52 @@ export default class Event implements IEvent {
     private readonly categories = CONFIG.SYSTEM.CHANNELS.filter((category) => category.TYPE === "voices").map(
         (category) => category.ID
     );
-    private voices = new Collection();
+    private voices = new Collection<string, IVoice>();
 
     async execute(client: Core, oldState: VoiceState, newState: VoiceState) {
-        const category = newState.channel?.parentID || oldState.channel?.parentID;
         if (
-            !oldState.member ||
+            !oldState.member || 
             oldState.member.guild.id !== CONFIG.SYSTEM.GUILD_ID ||
             oldState.member.user.bot ||
-            !category ||
-            !this.categories.includes(category) ||
+            newState.selfDeaf ||
             !client.checkStaff(oldState.id)
         )
             return;
 
+        const now = Date.now();
+
         if (!oldState.channelID && newState.channelID) {
-            this.voices.set(oldState.id, Date.now());
-            return;
+            this.voices.set(oldState.id, {
+                channel: newState.channel?.parentID || newState.channelID,
+                date: now,
+            });
+        }
+        
+        let voice = this.voices.get(oldState.id);
+        if (!voice) {
+            voice = {
+                channel: newState.channel?.parentID || newState.channelID!,
+                date: now,
+            };
+            this.voices.set(oldState.id, voice);
         }
 
-        let userData = this.voices.get(oldState.id);
-        if (!userData) {
-            userData = Date.now();
-            this.voices.set(oldState.id, userData);
-        }
-
-        const duration = Date.now() - (userData as number);
+        const diff = now - voice.date;
         if (oldState.channelID && !newState.channelID) {
             this.voices.delete(oldState.id);
-            ExperienceService.addPoint(oldState.member, oldState.channel as GuildChannel, "voices", duration);
-        } else if (!oldState.channelID && newState.channelID) {
-            this.voices.set(oldState.id, Date.now());
-            ExperienceService.addPoint(oldState.member, oldState.channel as GuildChannel, "voices", duration);
+
+            const category = oldState.channel?.parentID;
+            if (!category || !this.categories.includes(category)) return;
+            ExperienceService.addPoint(oldState.member, oldState.channel as GuildChannel, "voices", diff);
+        } else if (oldState.channelID && newState.channelID) {
+            this.voices.set(oldState.id, {
+                channel: newState.channel?.parentID || newState.channelID,
+                date: now
+            });
+
+            const category = newState.channel?.parentID;
+            if (!category || !this.categories.includes(category)) return;
+            ExperienceService.addPoint(oldState.member, oldState.channel as GuildChannel, "voices", diff);
         }
-    }
+     }
 }
