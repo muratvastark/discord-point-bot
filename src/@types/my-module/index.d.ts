@@ -13,6 +13,11 @@ declare module "my-module" {
         POINT: number;
     }
 
+    export interface IVoice {
+        channel: string;
+        date: number;
+    }
+
     export interface IChannel {
         NAME: string;
         POINT: number;
