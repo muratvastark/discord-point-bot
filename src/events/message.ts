@@ -23,8 +23,8 @@ export default class Event implements IEvent {
             if (command) command.execute({ client, message, args });
         } else {
             const channel = message.channel as GuildChannel;
-            if (!channel.parentID || !this.categories.includes(channel.parentID) || !client.checkStaff(message.author.id))
-                return;
+
+            if (!channel.parentID || !this.categories.includes(channel.parentID) || client.checkStaff(message.author.id) === false) return;
 
             const cooldownData = CONFIG.SYSTEM.CHANNELS.find((category) => category.ID === channel.parentID);
 
