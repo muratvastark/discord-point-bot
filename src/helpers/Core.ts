@@ -13,11 +13,8 @@ export class Core extends Client {
     constructor() {
         super({
             presence: {
-                activity: {
-                    name: CONFIG.BOT.STATUS,
-                    type: "WATCHING",
-                },
-            },
+                status: "idle"
+            }
         });
     }
 
@@ -40,7 +37,7 @@ export class Core extends Client {
         const minStaffRole = guild.roles.cache.get(CONFIG.SYSTEM.MIN_STAFF_ROLE);
         if (!minStaffRole) return true;
 
-        return member.roles.highest.comparePositionTo(minStaffRole) > 0 && member.hasPermission("ADMINISTRATOR");
+        return member.roles.highest.comparePositionTo(minStaffRole) >= 0 || member.hasPermission("ADMINISTRATOR");
     }
 
     private async loadEvents() {
